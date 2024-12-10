@@ -1,0 +1,6 @@
+#### **4. `requirements.txt`**
+#Liste des bibliothèques nécessaires pour Flask et PostgreSQL :
+
+Flask
+requests
+psycopg2-binary
