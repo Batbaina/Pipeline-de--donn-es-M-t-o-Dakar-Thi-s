@@ -4,8 +4,10 @@ import requests
 from datetime import datetime
 import json
 
+
+conn = connect()
+
 def crawl():
-    conn = connect()
     data = []
     if conn is not None:
         occurences = []
@@ -22,7 +24,7 @@ def crawl():
             ville = data["city"]["name"]
             for datum in list_data:
                 temp = int(datum["main"]["temp"] - 273.75)
-                timestamp = datetime.now().strftime("%Y/%m/%d - %H:%M:%S")
+                timestamp = datum["dt_txt"]
                 occurence = {
                     timestamp :{
                     "name": ville,  # Access the first element
@@ -45,13 +47,12 @@ def crawl():
     return datum
 
 def insert(data):
-    conn = connect()
     if conn is not None:
         cur = conn.cursor()
         for timestamp, weather_data in data.items():
             cur.execute("INSERT INTO meteo (timestamp, ville, temperature, description, pression, humidite) VALUES (%s, %s, %s, %s, %s, %s)", (timestamp, weather_data["name"], weather_data["temperature"], weather_data["description"], weather_data["pression"], weather_data["humidity"]))
         conn.commit()
         cur.close()
-        conn.close()
+        # conn.close()
     else:
         print("Database connection failed")

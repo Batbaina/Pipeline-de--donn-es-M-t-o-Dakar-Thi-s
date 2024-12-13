@@ -8,7 +8,7 @@ def connect():
             password = 'logyouin',
             host="localhost"
         )
-        print("Base de donnée connectée avec succès")
+        # print("Base de donnée connectée avec succès")
         return conn
     except psycopg2.Error as e:
         print(f"Echec de la connexion à la base de donnée {e}")
