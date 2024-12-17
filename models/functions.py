@@ -3,13 +3,17 @@ from flask import jsonify
 import requests
 from datetime import datetime
 import json
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def crawl():
     conn = connect()
     data = []
     if conn is not None:
         occurences = []
-        api_key = '741ed36b784c1106f493ba003bc8f39d'
+        api_key = os.getenv('api_key')
         lat = 14.6937
         lon = -17.444059
         # start = 1369789200
@@ -38,11 +42,11 @@ def crawl():
             
             return occurences
         else:
-            data = f"Problems with API response {response.status_code}"
+            data = f"Problems with API response {response.status_code}" 
     else:
        data = "Problems with Database"
     
-    return datum
+    return data
 
 def insert(data):
     conn = connect()
@@ -52,6 +56,5 @@ def insert(data):
             cur.execute("INSERT INTO meteo (timestamp, ville, temperature, description, pression, humidite) VALUES (%s, %s, %s, %s, %s, %s)", (timestamp, weather_data["name"], weather_data["temperature"], weather_data["description"], weather_data["pression"], weather_data["humidity"]))
         conn.commit()
         cur.close()
-        conn.close()
     else:
         print("Database connection failed")
