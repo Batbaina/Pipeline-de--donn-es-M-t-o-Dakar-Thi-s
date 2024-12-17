@@ -3,13 +3,17 @@ from flask import jsonify
 import requests
 from datetime import datetime
 import json
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def crawl():
     conn = connect()
     data = []
     if conn is not None:
         occurences = []
-        api_key = '741ed36b784c1106f493ba003bc8f39d'
+        api_key = os.getenv('api_key')
         lat = 14.6937
         lon = -17.444059
         # start = 1369789200
@@ -42,7 +46,7 @@ def crawl():
     else:
        data = "Problems with Database"
     
-    return datum
+    return data
 
 def insert(data):
     conn = connect()
