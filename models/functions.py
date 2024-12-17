@@ -42,7 +42,7 @@ def crawl():
             
             return occurences
         else:
-            data = f"Problems with API response {response.status_code}"
+            data = f"Problems with API response {response.status_code}" 
     else:
        data = "Problems with Database"
     
