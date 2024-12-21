@@ -1,34 +1,27 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:15
-    container_name: postgres_service
-    environment:
-      POSTGRES_USER: your_postgres_user
-      POSTGRES_PASSWORD: your_postgres_password
-      POSTGRES_DB: weather_data
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
-    ports:
-      - "5432:5432"
-
-  flask_app:
+  app:
     build:
       context: ./app
-      dockerfile: Dockerfile
-    container_name: flask_service
     environment:
-      POSTGRES_USER: your_postgres_user
-      POSTGRES_PASSWORD: your_postgres_password
-      POSTGRES_DB: weather_data
-      POSTGRES_HOST: postgres
-      OPENWEATHER_API_KEY: your_api_key
+      - API_KEY=${API_KEY}
     depends_on:
-      - postgres
-    ports:
-      - "5000:5000"
+      - db
+    networks:
+      - app-network
 
-volumes:
-  postgres_data:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: ericona
+      POSTGRES_PASSWORD: ericona
+      POSTGRES_DB: weather
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
