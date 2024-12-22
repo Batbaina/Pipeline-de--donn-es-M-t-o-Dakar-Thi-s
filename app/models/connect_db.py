@@ -1,22 +1,17 @@
 import pg8000
 import os
-from dotenv import load_dotenv
-
-# Charger les variables d'environnement depuis .env
-load_dotenv()
 
 def connect():
-    """Fonction pour se connecter à la base de données PostgreSQL avec pg8000"""
+    """Connect to the PostgreSQL database using pg8000."""
     try:
-        # Paramètres de connexion
         conn = pg8000.connect(
-            user="postgres",  # Nom d'utilisateur (par défaut 'postgres')
-            password=os.getenv("POSTGRES_PASSWORD", "ericona"),  # Mot de passe (par défaut 'erico')
-            host="localhost",  # Hôte local
-            port=5432,  # Port PostgreSQL par défaut
-            database="meteo_db"  # Nom de la base de données
+            user=os.getenv('DB_USER', 'postgres'),
+            password=os.getenv('DB_PASSWORD', 'ericona'),
+            host=os.getenv('DB_HOST', 'db'),  # 'db' is the service name from docker-compose.yml
+            port=os.getenv('DB_PORT', 5432),
+            database=os.getenv('DB_NAME', 'meteo_db')
         )
         return conn
     except Exception as e:
-        print(f"Erreur : impossible de se connecter à la base de données. {e}")
+        print(f"Error connecting to the database: {e}")
         return None

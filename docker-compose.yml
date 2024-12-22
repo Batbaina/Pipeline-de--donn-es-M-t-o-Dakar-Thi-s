@@ -4,24 +4,29 @@ services:
   app:
     build:
       context: ./app
-    environment:
-      - API_KEY=${API_KEY}
+      dockerfile: Dockerfile
+    container_name: Extract_weather_app
+    ports:
+      - "1000:1000"
+    volumes:
+      - ./app:/app
+    env_file:
+      - ./.env
     depends_on:
       - db
-    networks:
-      - app-network
+    command: ["python", "app.py"]  # Adjust command to run your Flask app
 
   db:
     image: postgres:17
-    environment:
-      POSTGRES_USER: ericona
-      POSTGRES_PASSWORD: ericona
-      POSTGRES_DB: weather
+    container_name: postgres_db
     ports:
       - "5432:5432"
-    networks:
-      - app-network
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ericona
+      POSTGRES_DB: meteo_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
-networks:
-  app-network:
-    driver: bridge
+volumes:
+  postgres_data:
