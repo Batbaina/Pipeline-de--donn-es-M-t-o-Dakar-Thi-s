@@ -1,19 +1,16 @@
+# app.py (modifications)
 from flask import Flask, jsonify
 import requests
 from datetime import datetime
 import os
 from dotenv import load_dotenv
-from apscheduler.schedulers.background import BackgroundScheduler
 from models.connect_db import connect
-
 from models.init_db import initialize_database
 
 # Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
-
-
 
 # Initialiser la base de données
 initialize_database()
@@ -101,22 +98,11 @@ def insert(data):
     finally:
         conn.close()
 
-# Function to schedule the crawl every 2 hours
-def schedule_crawl():
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(crawl, 'interval', hours=2)  # Every 2 hours
-    scheduler.start()
-
 @app.route('/')
 def fetch_weather():
     """Flask route to fetch weather data."""
     data = crawl()
-    print("Bonjour")
     return data
 
-
-
-
 if __name__ == '__main__':
-    schedule_crawl()  # Start the scheduler
     app.run(host="0.0.0.0", port=1000, debug=True)

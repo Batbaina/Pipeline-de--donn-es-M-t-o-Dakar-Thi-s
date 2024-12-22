@@ -1,11 +1,10 @@
-version: '3.8'
 
 services:
   app:
     build:
       context: ./app
       dockerfile: Dockerfile
-    container_name: Extract_weather_app
+    container_name: Extract_weather_app_with_airflow
     ports:
       - "1000:1000"
     volumes:
@@ -14,7 +13,8 @@ services:
       - ./.env
     depends_on:
       - db
-    command: ["python", "app.py"]  # Adjust command to run your Flask app
+      - airflow-web
+    command: ["python", "app.py"]
 
   db:
     image: postgres:17
@@ -27,6 +27,33 @@ services:
       POSTGRES_DB: meteo_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  airflow-web:
+    image: apache/airflow:2.7.1
+    container_name: airflow-web
+    environment:
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+pg8000://postgres:ericona@db:5432/meteo_db
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+    volumes:
+      - ./dags:/opt/airflow/dags
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    command: webserver
+
+  airflow-scheduler:
+    image: apache/airflow:2.7.1
+    container_name: airflow-scheduler
+    environment:
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+pg8000://postgres:ericona@db:5432/meteo_db
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+    volumes:
+      - ./dags:/opt/airflow/dags
+    depends_on:
+      - db
+    command: scheduler
 
 volumes:
   postgres_data:
