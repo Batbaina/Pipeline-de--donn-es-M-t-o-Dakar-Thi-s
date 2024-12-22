@@ -1,34 +1,59 @@
-version: '3.8'
 
 services:
-  postgres:
-    image: postgres:15
-    container_name: postgres_service
-    environment:
-      POSTGRES_USER: your_postgres_user
-      POSTGRES_PASSWORD: your_postgres_password
-      POSTGRES_DB: weather_data
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
-    ports:
-      - "5432:5432"
-
-  flask_app:
+  app:
     build:
       context: ./app
       dockerfile: Dockerfile
-    container_name: flask_service
-    environment:
-      POSTGRES_USER: your_postgres_user
-      POSTGRES_PASSWORD: your_postgres_password
-      POSTGRES_DB: weather_data
-      POSTGRES_HOST: postgres
-      OPENWEATHER_API_KEY: your_api_key
-    depends_on:
-      - postgres
+    container_name: Extract_weather_app_with_airflow
     ports:
-      - "5000:5000"
+      - "1000:1000"
+    volumes:
+      - ./app:/app
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+      - airflow-web
+    command: ["python", "app.py"]
+
+  db:
+    image: postgres:17
+    container_name: postgres_db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ericona
+      POSTGRES_DB: meteo_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  airflow-web:
+    image: apache/airflow:2.7.1
+    container_name: airflow-web
+    environment:
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+pg8000://postgres:ericona@db:5432/meteo_db
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+    volumes:
+      - ./dags:/opt/airflow/dags
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    command: webserver
+
+  airflow-scheduler:
+    image: apache/airflow:2.7.1
+    container_name: airflow-scheduler
+    environment:
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+pg8000://postgres:ericona@db:5432/meteo_db
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+    volumes:
+      - ./dags:/opt/airflow/dags
+    depends_on:
+      - db
+    command: scheduler
 
 volumes:
   postgres_data:
