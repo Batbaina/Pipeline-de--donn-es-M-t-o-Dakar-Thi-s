@@ -46,7 +46,7 @@ def crawl():
 
             for datum in list_data:
                 temp = int(datum["main"]["temp"] - 273.15)  # Convert temperature to Celsius
-                timestamp = datetime.now().strftime("%Y/%m/%d - %H:%M:%S")
+                timestamp = datum["dt_txt"]
                 occurence = {
                     timestamp: {
                         "name": ville["name"],
