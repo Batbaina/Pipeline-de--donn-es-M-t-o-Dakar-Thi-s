@@ -10,7 +10,7 @@ from models.init_db import initialize_database
 # Load environment variables
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__) 
 
 # Initialiser la base de données
 initialize_database()
