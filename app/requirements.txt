@@ -1,0 +1,7 @@
+Flask
+python-dotenv==1.0.0
+apscheduler==3.10.1
+pg8000==1.29.5
+requests==2.31.0
+apache-airflow==2.8.1
+apache-airflow-providers-imap==3.7.0
